@@ -1,0 +1,55 @@
+{
+  "redirects": [
+    { "source": "/:path(.*)", "has": [{ "type": "host", "value": "www.smartfieldinia.cl" }], "destination": "https://smartfieldinia.cl/:path", "permanent": true },
+    { "source": "/cursos/riego/Sala", "destination": "/cursos/riego/Sala/", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/app", "destination": "/app.html" },
+    { "source": "/registro", "destination": "/registro.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/recuperar", "destination": "/recuperar.html" },
+    { "source": "/nueva-clave", "destination": "/nueva-clave.html" },
+    { "source": "/api/chat/stream", "destination": "/api/chat-stream" },
+    { "source": "/api/geocode", "destination": "/api/fields?geocode=1" },
+    { "source": "/api/admin", "destination": "/api/profile?admin=1" },
+    { "source": "/api/interes", "destination": "/api/registro-config?interes=1" }
+  ],
+  "functions": {
+    "api/chat-stream.js":      { "maxDuration": 90 },
+    "api/gee-token.js":        { "maxDuration": 10 },
+    "api/profile.js":          { "maxDuration": 15 },
+    "api/fields.js":           { "maxDuration": 30 },
+    "api/climate.js":          { "maxDuration": 30 },
+    "api/advisor-links.js":    { "maxDuration": 10 },
+    "api/conversations.js":    { "maxDuration": 15 },
+    "api/registro-config.js":  { "maxDuration": 10 },
+    "api/cron/check-alerts.js": { "maxDuration": 300 },
+    "api/cron/backfill-field.js": { "maxDuration": 300 },
+    "api/whatsapp-webhook.js": { "maxDuration": 180 }
+  },
+  "crons": [
+    { "path": "/api/cron/check-alerts", "schedule": "0 11 * * *" },
+    { "path": "/api/cron/backfill-field", "schedule": "30 8 * * *" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(self), payment=()" },
+        { "key": "Content-Security-Policy-Report-Only", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://earthengine.googleapis.com https://*.googleapis.com https://archive-api.open-meteo.com https://api.open-meteo.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'" }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin",  "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,PATCH,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
+  ]
+}

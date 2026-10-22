@@ -1,0 +1,310 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Smartfield INIA — sistema de diseño dark/light + neón verde
+   Los tokens semánticos cambian según [data-theme]; los colores
+   de Tailwind (ink, mist, edge, strong…) los referencian, así
+   los componentes existentes se adaptan sin reescribir clases.
+   ============================================================ */
+
+:root,
+[data-theme="dark"] {
+  --bg: #040d0a;
+  --bg-2: #06140f;
+  --bg-3: #0a1f17;
+  --fg-strong: #ffffff;
+  --fg: #e6f5ec;
+  --fg-muted: #c7e7d9;
+  --fg-soft: #8aa99c;
+  --surface: rgba(255, 255, 255, 0.035);
+  --surface-border: rgba(122, 193, 67, 0.18);
+  --grid-line: rgba(122, 193, 67, 0.05);
+  --grad-from: #9be85c;
+  --grad-mid: #2ddcc7;
+  --grad-to: #19c9b4;
+  --accent-text: #7ac143;
+  --field-glow-1: rgba(14, 147, 132, 0.18);
+  --field-glow-2: rgba(122, 193, 67, 0.12);
+  --field-glow-3: rgba(45, 220, 199, 0.1);
+  --field-mask: 0.4;
+}
+
+[data-theme="light"] {
+  /* Claro con la paleta de los logos Avisa / INIA (2026-10): blanco cálido,
+     teal #0E6B5C de la tipografía y verde #5BB21E del isotipo. */
+  --bg: #f7faf6;
+  --bg-2: #eef5ee;
+  --bg-3: #e2eee3;
+  --fg-strong: #0b2b25;
+  --fg: #1d3a33;
+  --fg-muted: #2f4d45;
+  --fg-soft: #56706a;
+  --surface: rgba(255, 255, 255, 0.86);
+  --surface-border: rgba(14, 107, 92, 0.16);
+  --grid-line: rgba(14, 107, 92, 0.045);
+  --grad-from: #0e6b5c;
+  --grad-mid: #2f8f3a;
+  --grad-to: #5bb21e;
+  --accent-text: #0e6b5c;
+  --field-glow-1: rgba(91, 178, 30, 0.1);
+  --field-glow-2: rgba(14, 107, 92, 0.08);
+  --field-glow-3: rgba(125, 196, 232, 0.12);
+  --field-mask: 0.55;
+}
+
+@theme {
+  /* Fondos / superficies (theme-aware via vars) */
+  --color-ink: var(--bg);
+  --color-ink-2: var(--bg-2);
+  --color-ink-3: var(--bg-3);
+
+  /* Texto */
+  --color-strong: var(--fg-strong);
+  --color-mist: var(--fg-muted);
+  --color-mist-soft: var(--fg-soft);
+
+  /* Bordes glass */
+  --color-edge: var(--surface-border);
+
+  /* Acentos neón INIA (fijos en ambos temas) */
+  --color-lime: #7ac143;
+  --color-lime-bright: #9be85c;
+  --color-teal: #0e9384;
+  --color-teal-bright: #19c9b4;
+  --color-cyan: #2ddcc7;
+  --color-onlime: #06160f; /* texto sobre botón lima (siempre oscuro) */
+  /* Marca Avisa (logos 2026-10) */
+  --color-avisa: #0e6b5c;
+  --color-avisa-green: #5bb21e;
+  --color-avisa-sky: #7dc4e8;
+
+  /* Tipografía */
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+}
+
+:root {
+  --background: var(--bg);
+  --foreground: var(--fg);
+}
+
+* {
+  border-color: var(--color-edge);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ---------- Fondo global: grid satelital + glow orbs + spotlight ---------- */
+.bg-field {
+  position: fixed;
+  inset: 0;
+  z-index: -4;
+  background:
+    radial-gradient(900px 600px at 15% -5%, var(--field-glow-1), transparent 60%),
+    radial-gradient(800px 700px at 90% 10%, var(--field-glow-2), transparent 55%),
+    radial-gradient(1000px 800px at 50% 110%, var(--field-glow-3), transparent 60%),
+    var(--bg);
+  transition: background-color 0.3s ease;
+}
+
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Spotlight que sigue el cursor (vars --spot-x/--spot-y actualizadas en JS) */
+.bg-spot {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: radial-gradient(
+    520px circle at var(--spot-x, 50%) var(--spot-y, -20%),
+    rgba(122, 193, 67, 0.1),
+    transparent 70%
+  );
+  transition: background 0.18s ease-out;
+}
+[data-theme="light"] .bg-spot {
+  background: radial-gradient(
+    520px circle at var(--spot-x, 50%) var(--spot-y, -20%),
+    rgba(14, 147, 132, 0.12),
+    transparent 70%
+  );
+}
+
+/* ---------- Utilidades ---------- */
+.glass {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.glow-lime {
+  box-shadow: 0 0 0 1px rgba(122, 193, 67, 0.3), 0 8px 40px rgba(122, 193, 67, 0.18);
+}
+
+/* ---------- Tarjeta con giro 3D (flip on click) ---------- */
+.flip-card {
+  perspective: 1400px;
+}
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.flip-card.is-flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+.flip-card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .flip-card-inner {
+    transition: none;
+  }
+}
+
+.text-gradient {
+  background: linear-gradient(120deg, var(--grad-from) 0%, var(--grad-mid) 60%, var(--grad-to) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.kicker {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+/* Ocultar scrollbar (tiras horizontales en mobile) */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Logo unificado Smartfield INIA: dos archivos (tinta teal en claro, tipografía
+   blanca en oscuro) que se alternan por CSS, sin filtros ni JS. El tour tiene
+   su propio data-theme="dark", así que hereda la variante correcta solo. */
+.logo-sfi-dark {
+  display: none;
+}
+[data-theme="dark"] .logo-sfi-light {
+  display: none;
+}
+[data-theme="dark"] .logo-sfi-dark {
+  display: block;
+}
+
+/* Logo oficial de Avisa sin recolorear: en oscuro va sobre una placa blanca
+   para que su tinta teal se lea. */
+[data-theme="dark"] .logo-avisa {
+  background: #fff;
+  border-radius: 14px;
+  padding: 6px 12px;
+}
+
+/* En claro las tarjetas glass llevan una sombra suave: sin ella el blanco
+   sobre blanco no separa. */
+[data-theme="light"] .glass {
+  box-shadow: 0 1px 2px rgba(11, 43, 37, 0.04), 0 8px 24px rgba(11, 43, 37, 0.05);
+}
+[data-theme="light"] .glow-lime {
+  box-shadow: 0 1px 2px rgba(11, 43, 37, 0.06), 0 10px 30px rgba(14, 107, 92, 0.1);
+}
+[data-theme="light"] .bg-grid {
+  opacity: 0.6;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(122, 193, 67, 0.25);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(122, 193, 67, 0.45);
+}
+
+/* Animaciones */
+@keyframes border-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+.animate-float { animation: float-slow 7s ease-in-out infinite; }
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  70% { transform: scale(1.6); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* Marquee (partners) */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; }
+}

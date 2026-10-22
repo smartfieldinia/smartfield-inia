@@ -1,0 +1,301 @@
+/* ════════════════════════════════════════════════════════════════════════
+   Sistema de diseño de las páginas de cuenta: /login, /recuperar y
+   /nueva-clave. Extraído de login.html (que lo tenía inline) cuando se
+   agregaron las páginas de recuperación de contraseña, para no mantener
+   la misma hoja copiada en tres archivos.
+
+   ⚠️ /registro NO usa esta hoja: tiene la suya, más grande (wizard, mapa
+   Leaflet, lista de cuarteles). Si tocas un token de acá, mira si el mismo
+   token existe allá.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tokens (comunes a ambos temas) ───────────────────────────── */
+:root {
+  --lime:         #7ac143;
+  --teal:         #0e9384;
+  --error:        #e05c5c;
+  --radius:       14px;
+}
+/* ── Tema OSCURO ──────────────────────────────────────────────── */
+[data-theme="dark"] {
+  --bg:           #030e08;
+  --bg2:          #061408;
+  --bg3:          #0a1f10;
+  --surface:      rgba(255,255,255,0.038);
+  --border:       rgba(122,193,67,0.18);
+  --border-hover: rgba(122,193,67,0.38);
+  --input-bg:     rgba(0,0,0,0.3);
+  --fg:           #e6f5ec;
+  --fg-muted:     #9fbfb0;
+  --fg-strong:    #ffffff;
+  --accent:       #8fd154;   /* lima para textos sobre fondo oscuro */
+  --lime-dim:     rgba(122,193,67,0.14);
+  --teal-dim:     rgba(14,147,132,0.16);
+  --glow1:        rgba(14,147,132,0.12);
+  --glow2:        rgba(122,193,67,0.08);
+  --grid-line:    rgba(122,193,67,0.04);
+  --logo-invert:  1;
+  --shadow:       0 10px 40px rgba(0,0,0,0.35);
+  /* Botones de proveedor: superficie clara propia, legible en dark */
+  --oauth-bg:     #ffffff;
+  --oauth-fg:     #1f1f1f;
+  --oauth-border: rgba(255,255,255,0.22);
+}
+/* ── Tema CLARO ───────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg:           #f7faf6;
+  --bg2:          #ffffff;
+  --bg3:          #e2eee3;
+  --surface:      #ffffff;
+  --border:       rgba(14,107,92,0.18);
+  --border-hover: rgba(14,107,92,0.45);
+  --input-bg:     #ffffff;
+  --fg:           #1d3a33;
+  --fg-muted:     #4f6963;
+  --fg-strong:    #0b2b25;
+  --accent:       #0e6b5c;   /* teal de la marca Avisa, legible sobre claro */
+  --lime-dim:     rgba(122,193,67,0.18);
+  --teal-dim:     rgba(14,147,132,0.12);
+  --glow1:        rgba(14,147,132,0.10);
+  --glow2:        rgba(122,193,67,0.16);
+  --grid-line:    rgba(14,107,92,0.045);
+  --logo-invert:  0;
+  --shadow:       0 1px 2px rgba(11,43,37,0.05), 0 14px 40px rgba(11,43,37,0.09);
+  --oauth-bg:     #ffffff;
+  --oauth-fg:     #1f1f1f;
+  --oauth-border: rgba(0,0,0,0.18);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  min-height: 100%; background: var(--bg);
+  color: var(--fg); font-family: 'Inter', system-ui, sans-serif;
+  font-size: 17px; line-height: 1.65;
+}
+/* Chile stripe */
+.stripe { height: 4px; background: linear-gradient(90deg,#0a3d91 0 33%,#fff 33% 66%,#d52b1e 66% 100%); }
+
+/* ── Layout ──────────────────────────────────────────────────── */
+/* Descuenta la franja de la bandera (4px, fuera de .page): con 100vh a secas
+   las páginas cortas quedaban 4px más altas que la ventana y scrolleaban sin
+   contenido. dvh: en el teléfono no cuenta la barra del navegador. */
+.page { min-height: calc(100vh - 4px); min-height: calc(100dvh - 4px); display: flex; flex-direction: column; }
+header {
+  padding: 16px 24px; display: flex; align-items: center;
+  justify-content: space-between;
+  background: var(--bg2); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50;
+}
+/* Logo unificado Smartfield INIA (antes: logo INIA + wordmark SmartField).
+   Es un bloque de 1.69:1 con tres líneas apiladas, así que pide más altura que
+   aquel par para que la bajada institucional siga leyéndose — a cambio ocupa
+   bastante menos ancho.
+   ⚠️ Comparte fila con el toggle de tema y el enlace "Volver" (~80px juntos):
+   medido a 320px, el móvil más angosto todavía en uso. */
+.logos { display: flex; align-items: center; }
+.logos img { height: 64px; width: auto; }
+
+@media (max-width: 600px) {
+  .logos img { height: 46px; }
+}
+@media (max-width: 400px) {
+  header { padding: 12px 12px; }
+  .logos img { height: 40px; }
+}
+/* Smartfield: tinta teal en claro, tipografía blanca en oscuro (dos archivos).
+   Desde 2026-10 la cabecera lleva el logo oficial de Avisa (2,2:1). */
+.logo-sfi-dark { display: none; }
+[data-theme="dark"] .logo-sfi-light { display: none; }
+[data-theme="dark"] .logo-sfi-dark { display: block; }
+/* Logo oficial de Avisa (~/Desktop/AVISA/avisa-web.png) sin recolorear: en
+   oscuro va sobre una placa blanca para que su tinta teal se lea. */
+[data-theme="dark"] .logo-avisa { background: #fff; border-radius: 10px; padding: 3px 8px; }
+.logo-link { display: flex; align-items: center; }
+
+.header-actions { display: flex; align-items: center; gap: 10px; }
+.theme-toggle {
+  width: 46px; height: 46px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--fg-strong); cursor: pointer; display: flex;
+  align-items: center; justify-content: center; transition: all .2s; flex-shrink: 0;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.theme-toggle svg { width: 22px; height: 22px; }
+.back-link {
+  color: var(--fg-muted); text-decoration: none; font-size: 15px; font-weight: 500;
+  display: flex; align-items: center; gap: 7px; transition: color .2s;
+  padding: 8px 10px; border-radius: 10px;
+}
+.back-link:hover { color: var(--accent); }
+@media (max-width: 520px) { .back-link span { display: none; } }
+
+main { flex: 1; padding: 40px 20px 60px; display: flex; align-items: center; justify-content: center; }
+.container { max-width: 460px; width: 100%; margin: 0 auto; }
+
+/* ── Cards & Forms ────────────────────────────────────────────── */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 22px; padding: 40px 38px;
+  backdrop-filter: blur(14px); box-shadow: var(--shadow);
+}
+@media (max-width: 600px) { .card { padding: 26px 20px; } }
+
+.kicker {
+  font-size: 13px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--accent); font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; margin-bottom: 10px; display: block;
+}
+.card-title {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: 30px; color: var(--fg-strong); margin-bottom: 8px; line-height: 1.2;
+}
+@media (max-width: 600px) { .card-title { font-size: 26px; } }
+.card-subtitle { color: var(--fg-muted); font-size: 18px; margin-bottom: 30px; line-height: 1.55; }
+
+.form-grid { display: grid; gap: 18px; }
+
+label { display: block; font-size: 16px; font-weight: 600; color: var(--fg-strong); margin-bottom: 7px; }
+.field-help { font-size: 14px; color: var(--fg-muted); margin-top: 6px; line-height: 1.45; }
+.required::after { content: ' *'; color: var(--accent); }
+
+input[type="text"], input[type="email"], input[type="password"] {
+  width: 100%; padding: 14px 16px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--input-bg);
+  color: var(--fg-strong); font-size: 17px; font-family: inherit;
+  outline: none; transition: border-color .2s, box-shadow .2s;
+  -webkit-appearance: none; appearance: none;
+}
+input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--lime-dim); }
+input::placeholder { color: var(--fg-muted); }
+
+/* ── Password con toggle mostrar/ocultar ──────────────────────── */
+.pwd-wrap { position: relative; }
+.pwd-wrap input { padding-right: 44px; }
+.pwd-toggle {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; padding: 8px;
+  color: var(--fg-muted); display: flex; align-items: center;
+  transition: color .2s; border-radius: 8px;
+}
+.pwd-toggle:hover { color: var(--accent); }
+
+/* ── Buttons ──────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  padding: 15px 30px; border-radius: 100px; font-size: 17px; font-weight: 600;
+  border: none; cursor: pointer; transition: all .25s; text-decoration: none;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.btn-primary { background: var(--lime); color: #06160f; }
+.btn-primary:hover { box-shadow: 0 0 24px rgba(122,193,67,0.4); transform: translateY(-1px); }
+.btn-lg { padding: 17px 34px; font-size: 19px; }
+.btn-block { width: 100%; }
+.btn[disabled] { opacity: .55; pointer-events: none; cursor: default; transform: none; box-shadow: none; }
+.btn-spinner {
+  width: 15px; height: 15px; border: 2px solid rgba(6,22,15,0.35);
+  border-top-color: #06160f; border-radius: 50%; animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.btn-row { display: flex; gap: 12px; justify-content: center; margin-top: 28px; flex-wrap: wrap; }
+
+/* ── Botones de proveedor (Google / Microsoft) ────────────────────
+   Fondo blanco y logo a color en ambos temas: es lo que piden las guías
+   de marca de Google y Microsoft, y lo que la gente reconoce de un vistazo. */
+.oauth-row { display: grid; gap: 12px; margin-bottom: 22px; }
+.btn-oauth {
+  display: flex; align-items: center; justify-content: center; gap: 11px;
+  width: 100%; padding: 14px 20px; border-radius: 100px;
+  background: var(--oauth-bg); color: var(--oauth-fg);
+  border: 1px solid var(--oauth-border);
+  font-family: 'Space Grotesk', sans-serif; font-size: 16.5px; font-weight: 600;
+  cursor: pointer; transition: box-shadow .2s, transform .2s, border-color .2s;
+}
+.btn-oauth:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.16); transform: translateY(-1px); }
+.btn-oauth:focus-visible { outline: 3px solid var(--lime-dim); outline-offset: 2px; }
+.btn-oauth[disabled] { opacity: .55; pointer-events: none; }
+.btn-oauth svg { width: 20px; height: 20px; flex-shrink: 0; }
+.btn-oauth .btn-spinner { border-color: rgba(0,0,0,0.25); border-top-color: #1f1f1f; }
+
+/* Separador "o con tu correo" */
+.sep-o {
+  display: flex; align-items: center; gap: 14px;
+  color: var(--fg-muted); font-size: 15px; margin: 0 0 22px;
+}
+.sep-o::before, .sep-o::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ── Enlaces de pie de tarjeta ────────────────────────────────── */
+.switch-row { text-align: center; margin-top: 20px; font-size: 16px; color: var(--fg-muted); }
+.switch-row a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.switch-row a:hover { text-decoration: underline; }
+
+.forgot-row { text-align: right; margin-top: 8px; }
+.forgot-row a { color: var(--accent); font-size: 15px; font-weight: 500; text-decoration: none; }
+.forgot-row a:hover { text-decoration: underline; }
+
+.help-note { text-align: center; margin-top: 22px; font-size: 15px; color: var(--fg-muted); }
+.help-note a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.help-note a:hover { text-decoration: underline; }
+
+.nota {
+  background: var(--lime-dim); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px; font-size: 15.5px;
+  color: var(--fg); line-height: 1.5; margin-top: 4px;
+}
+
+/* Ícono grande de estado (correo enviado, enlace vencido) */
+.big-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+}
+.big-icon.ok   { background: var(--lime-dim); color: var(--accent); }
+.big-icon.warn { background: rgba(224,92,92,0.12); color: var(--error); }
+
+/* ── Toast ────────────────────────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  background: #2a0d0d; border: 1px solid var(--error); color: #ffd7d7;
+  padding: 15px 24px; border-radius: 12px; font-size: 16px; z-index: 9999;
+  max-width: 92vw; display: none; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+/* ── Field highlight for error ────────────────────────────────── */
+.field-error input { border-color: var(--error) !important; }
+.error-msg { font-size: 15px; font-weight: 500; color: var(--error); margin-top: 6px; display: none; }
+.field-error .error-msg { display: block; }
+
+/* ── Background grid (decorativo) ───────────────────────────────*/
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1;
+  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+body::after {
+  content: ''; position: fixed; inset: 0; z-index: -2;
+  background:
+    radial-gradient(900px 600px at 0% 0%, var(--glow1), transparent 55%),
+    radial-gradient(700px 500px at 100% 60%, var(--glow2), transparent 55%),
+    var(--bg);
+}
+
+/* ── Cerros de la marca Avisa al pie (decorativo) ──────────────
+   Las mismas tres franjas del logo: cielo, teal y verde. */
+.page::after {
+  content: ''; position: fixed; left: 0; right: 0; bottom: 0; height: 34vh;
+  z-index: 0; pointer-events: none; opacity: .55;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%237dc4e8' fill-opacity='.45' d='M0 190 C240 120 420 110 640 150 S1100 90 1440 120 V320 H0Z'/%3E%3Cpath fill='%230e6b5c' fill-opacity='.35' d='M0 240 C300 170 620 200 900 220 S1260 170 1440 190 V320 H0Z'/%3E%3Cpath fill='%235bb21e' fill-opacity='.45' d='M0 280 C320 230 700 250 1000 270 S1300 250 1440 255 V320 H0Z'/%3E%3C/svg%3E") bottom / 100% 100% no-repeat;
+}
+[data-theme="dark"] .page::after { opacity: .22; }
+/* El body tiene fondo propio y taparía un z-index negativo: los cerros van en
+   z 0 y el contenido encima. */
+main { position: relative; z-index: 1; }
+
+/* Pie: "Un servicio de INIA" con el logo Smartfield */
+.servicio {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-top: 26px; font-size: 13px; color: var(--fg-muted);
+}
+.servicio img { height: 34px; width: auto; }

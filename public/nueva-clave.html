@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear contraseña nueva — Avisa INIA</title>
+  <link rel="icon" href="/avisa-icon-32.png" type="image/png">
+  <link rel="apple-touch-icon" href="/avisa-icon-180.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap">
+
+  <!-- Tema: fijar antes del primer pintado para evitar parpadeo -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('sf-theme');
+        // Claro por defecto, igual que el landing (marca Avisa 2026-10)
+        if (t !== 'dark' && t !== 'light') t = 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="/auth.css">
+</head>
+<body>
+<div class="stripe"></div>
+<div class="page">
+
+  <header>
+    <div class="logos">
+      <a href="/avisa" class="logo-link">
+        <img src="/avisa-logo.png" alt="Avisa — Asistente Virtual de Información Satelital y Agroclimática · INIA" class="logo-avisa">
+      </a>
+    </div>
+    <div class="header-actions">
+      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar entre claro y oscuro" title="Cambiar entre claro y oscuro">
+        <svg id="theme-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"></svg>
+      </button>
+      <a href="/login" class="back-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>Volver</span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <!-- ── Verificando el enlace ──────────────────────────────── -->
+      <div class="card" id="card-cargando">
+        <div class="card-title">Un momento…</div>
+        <div class="card-subtitle" style="margin-bottom:0">Estamos revisando tu enlace.</div>
+      </div>
+
+      <!-- ── Formulario de contraseña nueva ─────────────────────── -->
+      <div class="card" id="card-form" style="display:none">
+        <span class="kicker">Avisa · INIA</span>
+        <div class="card-title" id="form-titulo">Crea tu contraseña nueva</div>
+        <div class="card-subtitle" id="form-subtitle">
+          Elige una contraseña que recuerdes. Debe tener al menos 8 caracteres.
+        </div>
+
+        <div class="form-grid">
+          <div id="f-password" class="field">
+            <label class="required">Contraseña nueva</label>
+            <div class="pwd-wrap">
+              <input type="password" id="password" placeholder="Al menos 8 caracteres" autocomplete="new-password">
+              <button type="button" class="pwd-toggle" id="pwd-toggle" aria-label="Mostrar contraseña"
+                      onclick="togglePassword('password','pwd-toggle','pwd-eye')">
+                <svg id="pwd-eye" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="error-msg">La contraseña debe tener al menos 8 caracteres</div>
+          </div>
+
+          <div id="f-password2" class="field">
+            <label class="required">Repite la contraseña</label>
+            <div class="pwd-wrap">
+              <input type="password" id="password2" placeholder="Escríbela otra vez" autocomplete="new-password">
+              <button type="button" class="pwd-toggle" id="pwd-toggle2" aria-label="Mostrar contraseña"
+                      onclick="togglePassword('password2','pwd-toggle2','pwd-eye2')">
+                <svg id="pwd-eye2" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="error-msg">Las dos contraseñas deben ser iguales</div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary btn-lg btn-block" id="btn-guardar" onclick="handleGuardar()"
+                  disabled data-needs-auth>
+            Guardar y entrar
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Enlace vencido o inválido ──────────────────────────── -->
+      <div class="card" id="card-invalido" style="display:none">
+        <div class="big-icon warn" aria-hidden="true">
+          <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16.5" x2="12.01" y2="16.5"/>
+          </svg>
+        </div>
+        <div class="card-title">Este enlace ya no sirve</div>
+        <div class="card-subtitle" id="invalido-detalle">
+          Los enlaces para cambiar la contraseña duran una hora y se pueden usar una sola vez.
+          Pide uno nuevo y vuelve a intentarlo.
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-primary btn-lg btn-block" href="/recuperar">Pedir un enlace nuevo</a>
+        </div>
+        <div class="switch-row">
+          ¿Recordaste tu contraseña? <a href="/login">Inicia sesión</a>
+        </div>
+      </div>
+
+      <!-- ── Listo ──────────────────────────────────────────────── -->
+      <div class="card" id="card-listo" style="display:none">
+        <div class="big-icon ok" aria-hidden="true">
+          <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div class="card-title">¡Listo!</div>
+        <div class="card-subtitle" id="listo-detalle">Tu contraseña quedó cambiada. Te estamos llevando a Avisa…</div>
+        <div class="btn-row">
+          <a class="btn btn-primary btn-lg btn-block" id="listo-btn" href="/app">Ir a Avisa</a>
+        </div>
+      </div>
+
+      <div class="help-note">
+        ¿Necesitas ayuda? <a id="help-link" href="#" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+      </div>
+
+      <div class="servicio">
+        Un servicio de
+        <img src="/smartfield-logo.png" alt="Smartfield INIA" class="logo-sfi-light">
+        <img src="/smartfield-logo-dark.png" alt="" aria-hidden="true" class="logo-sfi-dark">
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.4/dist/umd/supabase.min.js" integrity="sha384-yiVMs0R/Jyz7OhoXa/DsEMUSBLjEhr/QJta2ONO+zB6I8/GmNg/7AUFrZmAJV7KV" crossorigin="anonymous"></script>
+<script src="/auth-common.js"></script>
+
+<script>
+let supabaseClient = null;
+
+// El hash se lee ANTES de crear el cliente: supabase-js lo consume y lo
+// limpia de la URL al detectar la sesión, así que después ya no estaría.
+const HASH_INICIAL = window.location.hash || '';
+
+// Llegó desde el correo de invitación (cuentas solo por invitación, 2026-10-21):
+// la cuenta es nueva, así que después de la clave sigue a /registro (WhatsApp,
+// campo y avisos) en vez de ir directo a /app. Supabase marca el enlace con
+// `type=invite` en el hash; `?invitado=1` lo pone api/_admin.js en redirect_to.
+const ES_INVITACION = new URLSearchParams(location.search).get('invitado') === '1'
+  || new URLSearchParams(HASH_INICIAL.slice(1)).get('type') === 'invite';
+const DESTINO = ES_INVITACION ? '/registro' : '/app';
+
+function mostrar(cardId) {
+  ['card-cargando', 'card-form', 'card-invalido', 'card-listo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = id === cardId ? '' : 'none';
+  });
+}
+
+// Supabase avisa de un enlace vencido/usado redirigiendo con el error en el
+// hash (#error=access_denied&error_code=otp_expired&error_description=...),
+// no con una sesión. Sin esto la página se quedaría esperando para siempre.
+function errorDelHash(hash) {
+  if (!hash || hash.length < 2) return null;
+  const p = new URLSearchParams(hash.slice(1));
+  const code = p.get('error_code');
+  const err  = p.get('error');
+  if (!code && !err) return null;
+  if (code === 'otp_expired') {
+    return 'El enlace venció. Duran una hora desde que te llega el correo.';
+  }
+  if (err === 'access_denied') {
+    return 'El enlace ya se usó o no es válido. Pide uno nuevo.';
+  }
+  return p.get('error_description') || 'El enlace no es válido.';
+}
+
+// ¿Hay sesión? Tras volver del correo, supabase-js procesa el hash de forma
+// asíncrona, así que reintentamos un rato corto antes de darla por perdida.
+async function esperarSesion(intentos = 12, esperaMs = 250) {
+  for (let i = 0; i < intentos; i++) {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) return session;
+    await new Promise(r => setTimeout(r, esperaMs));
+  }
+  return null;
+}
+
+async function handleGuardar() {
+  const p1 = val('password');
+  const p2 = val('password2');
+
+  let ok = true;
+  ok = require('password', p1.length >= 8 ? p1 : '', 'La contraseña debe tener al menos 8 caracteres') && ok;
+  ok = require('password2', p2 && p1 === p2 ? p2 : '', p2 ? 'Las dos contraseñas deben ser iguales' : 'Repite la contraseña') && ok;
+  if (!ok) return;
+
+  const client = getAuthClient();
+  if (!client) return;
+
+  const btn = document.getElementById('btn-guardar');
+  btnLoading(btn, true, 'Guardando…');
+  try {
+    const { error } = await client.auth.updateUser({ password: p1 });
+    if (error) {
+      // La sesión del enlace puede haber caducado mientras llenaba el form.
+      if (/session|jwt|expired/i.test(error.message)) {
+        document.getElementById('invalido-detalle').textContent =
+          'Se venció el tiempo del enlace mientras escribías. Pide uno nuevo y vuelve a intentarlo.';
+        mostrar('card-invalido');
+        return;
+      }
+      showToast(translateError(error.message));
+      return;
+    }
+    mostrar('card-listo');
+    setTimeout(() => { window.location.href = DESTINO; }, 2000);
+  } catch (err) {
+    showToast('Error inesperado: ' + err.message);
+  } finally {
+    btnLoading(btn, false);
+  }
+}
+
+['password', 'password2'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); handleGuardar(); }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+(async function init() {
+  updateThemeIcon();
+  fillHelpLinks('Hola, tengo problemas para cambiar mi contraseña en Avisa INIA 🙏');
+
+  const errHash = errorDelHash(HASH_INICIAL);
+  if (errHash) {
+    document.getElementById('invalido-detalle').textContent = errHash;
+    mostrar('card-invalido');
+    return;
+  }
+
+  try {
+    const cfg = await fetch('/api/registro-config').then(r => r.json());
+    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) {
+      showToast('Configuración no disponible. Intenta recargando la página.');
+      return;
+    }
+    supabaseClient = window.supabaseClient = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+
+    const sesion = await esperarSesion();
+    if (!sesion) {
+      mostrar('card-invalido');
+      return;
+    }
+    // Recién con sesión válida tiene sentido dejar guardar la contraseña.
+    authReady();
+
+    // Si ya estaba con sesión iniciada (entró a mano, sin venir del correo),
+    // se lo decimos: sigue siendo su cuenta y puede cambiarla igual.
+    if (ES_INVITACION) {
+      document.getElementById('form-titulo').textContent = 'Bienvenido a Avisa';
+      document.getElementById('form-subtitle').textContent =
+        `Crea la contraseña de tu cuenta (${sesion.user?.email || 'tu correo'}). Debe tener al menos 8 caracteres. Después te pediremos tu WhatsApp y tu campo.`;
+      document.getElementById('listo-detalle').textContent = 'Tu contraseña quedó creada. Ahora, tu campo…';
+      document.getElementById('listo-btn').setAttribute('href', DESTINO);
+      document.getElementById('listo-btn').textContent = 'Continuar';
+    } else if (!HASH_INICIAL.includes('access_token')) {
+      document.getElementById('form-subtitle').textContent =
+        `Vas a cambiar la contraseña de ${sesion.user?.email || 'tu cuenta'}. Debe tener al menos 8 caracteres.`;
+    }
+    mostrar('card-form');
+    document.getElementById('password').focus();
+  } catch (e) {
+    console.error('init nueva-clave error:', e);
+    showToast('Error de conexión. Intenta recargar la página.');
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!--
+  Plantilla de "confirma tu cuenta" — Supabase → Authentication → Email Templates
+  → Confirm signup. Asunto sugerido:  Confirma tu cuenta de SmartField INIA
+
+  Se manda al crear una cuenta con correo y contraseña, cuando la confirmación
+  de correo está activada. Quien entra con Google o Microsoft NO lo recibe: su
+  proveedor ya verificó el correo.
+
+  Mismas reglas de correo que recovery.html (CSS inline, layout con tablas,
+  colores literales, marca como texto y enlace repetido en texto plano).
+  Ver email-templates/README.md.
+
+  Variable de Supabase: {{ .ConfirmationURL }}.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background-color:#eef3e8;margin:0;padding:24px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <tr>
+    <td align="center">
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="max-width:560px;background-color:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #dbe6d0;">
+
+        <!-- Franja tricolor, igual que el sitio -->
+        <tr>
+          <td style="padding:0;font-size:0;line-height:0;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td width="33%" style="background-color:#0a3d91;height:4px;font-size:0;line-height:0;">&nbsp;</td>
+                <td width="34%" style="background-color:#ffffff;height:4px;font-size:0;line-height:0;">&nbsp;</td>
+                <td width="33%" style="background-color:#d52b1e;height:4px;font-size:0;line-height:0;">&nbsp;</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:28px 32px 8px 32px;">
+            <div style="font-size:13px;letter-spacing:1.6px;text-transform:uppercase;color:#3f6e10;font-weight:700;">
+              SmartField INIA
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:8px 32px 0 32px;">
+            <h1 style="margin:0 0 14px 0;font-size:26px;line-height:1.25;color:#0f1c13;font-weight:700;">
+              Confirma tu correo
+            </h1>
+            <p style="margin:0 0 20px 0;font-size:17px;line-height:1.6;color:#3d4f42;">
+              ¡Bienvenido! Solo falta un paso: aprieta el botón para confirmar que este
+              correo es tuyo y seguir registrando tu campo.
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="center" style="padding:8px 32px 6px 32px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" style="background-color:#7ac143;border-radius:100px;">
+                  <a href="{{ .ConfirmationURL }}"
+                     style="display:inline-block;padding:16px 38px;font-size:18px;font-weight:700;
+                            color:#06160f;text-decoration:none;border-radius:100px;">
+                    Confirmar mi correo
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:18px 32px 0 32px;">
+            <p style="margin:0;font-size:15px;line-height:1.55;color:#5b6b5f;text-align:center;">
+              Después de confirmar volverás al registro para dibujar tu campo en el mapa.
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:22px 32px 0 32px;">
+            <p style="margin:0 0 6px 0;font-size:14px;line-height:1.5;color:#5b6b5f;">
+              ¿No te funciona el botón? Copia y pega esta dirección en tu navegador:
+            </p>
+            <p style="margin:0;font-size:13px;line-height:1.5;word-break:break-all;">
+              <a href="{{ .ConfirmationURL }}" style="color:#3f6e10;">{{ .ConfirmationURL }}</a>
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:22px 32px 28px 32px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                   style="background-color:#f2f7ec;border:1px solid #dbe6d0;border-radius:12px;">
+              <tr>
+                <td style="padding:14px 16px;">
+                  <p style="margin:0;font-size:15px;line-height:1.55;color:#3d4f42;">
+                    <strong>¿No creaste ninguna cuenta?</strong> Puedes ignorar este correo.
+                    Sin apretar el botón, no se crea nada a tu nombre.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Ayuda por WhatsApp.
+             El número NO se muestra a propósito: es un +1 de Estados Unidos
+             (número "Instant Setup" de Kapso) y a un agricultor chileno le
+             resta confianza, o le hace pensar que la llamada le cuesta. El
+             botón abre el chat con el número ya puesto, así que no hace falta
+             que lo lea ni lo escriba. -->
+        <tr>
+          <td style="padding:0 32px 30px 32px;border-top:1px solid #e8efe0;">
+            <p style="margin:18px 0 14px 0;font-size:15px;line-height:1.6;color:#3d4f42;text-align:center;">
+              ¿Necesitas ayuda?
+            </p>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
+              <tr>
+                <td align="center" style="background-color:#25D366;border-radius:100px;">
+                  <a href="https://wa.me/12082035994"
+                     style="display:inline-block;padding:12px 26px;font-size:16px;font-weight:700;
+                            color:#ffffff;text-decoration:none;border-radius:100px;">
+                    Escríbenos por WhatsApp
+                  </a>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:20px 0 0 0;font-size:13px;line-height:1.6;color:#8a9a8e;text-align:center;">
+              SmartField INIA · Instituto de Investigaciones Agropecuarias.<br>
+              Plataforma desarrollada por SADATA.
+            </p>
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
