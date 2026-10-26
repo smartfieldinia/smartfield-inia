@@ -1,6 +1,6 @@
-# Smartfield INIA
+# SmartField INIA
 
-Smart Extension INIA: landing, web app de asistencia técnica con el asistente **Avisa** (chat + WhatsApp), onboarding de predios y alertas de clima/NDVI. Producción: [smartfieldinia.cl](https://smartfieldinia.cl).
+SmartField INIA: landing, web app de asistencia técnica con el asistente **AVISA INIA** (chat web + WhatsApp), onboarding de predios y alertas de clima/NDVI. Producción: [smartfieldinia.cl](https://smartfieldinia.cl).
 
 ## Stack
 

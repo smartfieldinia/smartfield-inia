@@ -43,7 +43,7 @@ async function reverseGeocode(polygon) {
   try {
     const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${centroid.lat}&lon=${centroid.lon}&zoom=10&addressdetails=1`;
     const r = await fetch(url, {
-      headers: { 'User-Agent': 'SmartExtensionINIA/1.0 (contacto@sadata.io)' },
+      headers: { 'User-Agent': 'SmartFieldINIA/1.0 (contacto@sadata.io)' },
       // Corto a propósito: esto es best-effort y corre dentro del POST que crea
       // el campo. Mejor guardar sin comuna que timeoutear el alta entera.
       signal: AbortSignal.timeout(5000),

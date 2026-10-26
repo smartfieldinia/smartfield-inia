@@ -90,7 +90,7 @@ Para el valle de Cachapoal (alturas 300–600 msnm), INIA recomienda portainjert
 > El asistente con acceso completo a las **19.000+ publicaciones INIA** y búsqueda semántica estará disponible públicamente muy pronto.`,
 };
 
-const DEMO_FALLBACK = `Gracias por tu consulta. El asistente inteligente de la Plataforma Smart Extension INIA, con acceso a más de **19.000 publicaciones técnicas** de la Biblioteca Digital INIA y búsqueda semántica avanzada, estará disponible al público **próximamente**.
+const DEMO_FALLBACK = `Gracias por tu consulta. El asistente inteligente de la plataforma SmartField INIA, con acceso a más de **19.000 publicaciones técnicas** de la Biblioteca Digital INIA y búsqueda semántica avanzada, estará disponible al público **próximamente**.
 
 Mientras tanto puedes:
 - Explorar la [Biblioteca Digital INIA](https://biblioteca.inia.cl) directamente
